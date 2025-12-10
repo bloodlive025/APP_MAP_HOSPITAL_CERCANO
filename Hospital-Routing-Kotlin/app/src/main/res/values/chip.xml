@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomChipStyle" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="chipMinHeight">20dp</item>   <!-- altura -->
+        <item name="android:textSize">16sp</item>  <!-- tamaño del texto -->
+        <item name="chipCornerRadius">12dp</item>  <!-- bordes -->
+        <item name="chipStartPadding">0dp</item>
+        <item name="chipEndPadding">12dp</item>
+    </style>
+</resources>
