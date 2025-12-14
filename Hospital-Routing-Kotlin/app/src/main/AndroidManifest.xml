@@ -31,7 +31,8 @@
         <activity android:name="com.programmingtask.hospitalroutingappk.EspecialidadActivity"/>
         <activity android:name="com.programmingtask.hospitalroutingappk.MapActivity"/>
         <activity android:name="com.programmingtask.hospitalroutingappk.AddHospitalActivity"/>
-
+        <activity android:name="com.programmingtask.hospitalroutingappk.SeleccionarUbicacionActivity"/>
+        <activity android:name="com.programmingtask.hospitalroutingappk.HorarioDeAtencionActivity"/>
     </application>
 
 </manifest>

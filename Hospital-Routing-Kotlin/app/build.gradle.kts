@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation("com.google.maps.android:maps-utils-ktx:3.4.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation(libs.androidx.fragment)
     //
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

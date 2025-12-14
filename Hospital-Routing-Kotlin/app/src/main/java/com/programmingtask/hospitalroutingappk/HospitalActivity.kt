@@ -45,8 +45,6 @@ class HospitalActivity: AppCompatActivity() {
 
 
 
-
-
     }
 
     private fun cargarHospitales(ref: com.google.firebase.database.DatabaseReference) {

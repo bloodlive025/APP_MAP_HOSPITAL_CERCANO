@@ -17,6 +17,7 @@ retrofitVersion = "2.9.0"
 converter_gsonVersion = "2.9.0"
 kotlinx_coroutines_androidVersion = "1.7.3"
 firebaseStorageKtx = "22.0.1"
+fragment = "1.8.9"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,6 +35,7 @@ retrofit = {group = "com.squareup.retrofit2", name ="retrofit", version.ref = "r
 converter-gson = {group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converter_gsonVersion"}
 kotlinx-coroutines-android = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx_coroutines_androidVersion"}
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+androidx-fragment = { group = "androidx.fragment", name = "fragment", version.ref = "fragment" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

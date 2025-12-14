@@ -6,33 +6,33 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="406dp"
-        android:layout_height="105dp"
+        android:layout_width="399dp"
+        android:layout_height="186dp"
         android:orientation="horizontal"
         tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp">
+        tools:layout_editor_absoluteY="3dp">
 
         <ImageView
             android:id="@+id/imageView2"
-            android:layout_width="13dp"
-            android:layout_height="86dp"
+            android:layout_width="161dp"
+            android:layout_height="143dp"
             android:layout_weight="1"
             tools:srcCompat="@tools:sample/avatars" />
 
         <LinearLayout
-            android:layout_width="199dp"
-            android:layout_height="match_parent"
+            android:layout_width="316dp"
+            android:layout_height="175dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/lblnombreHospital"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="31dp" />
 
             <TextView
                 android:id="@+id/lblespecialidades"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="31dp"
                 android:text="especialidades" />
 
             <TextView
@@ -43,32 +43,20 @@
 
             <Button
                 android:id="@+id/btnubicacion"
-                android:layout_width="153dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:insetLeft="12dp"
                 android:insetRight="5dp"
                 android:insetBottom="6dp"
                 android:rotationX="6"
                 android:text="Ubicacion" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="55dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/btnmodificarhospital"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Modificar" />
 
             <Button
                 android:id="@+id/btnEliminarHospital"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Eliminar" />
+                android:textSize="14sp"
+                tools:text="Eliminar" />
         </LinearLayout>
 
     </LinearLayout>

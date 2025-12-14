@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         btnHospital.setOnClickListener {
             val intent = Intent(this, HospitalActivity::class.java)
             startActivity(intent)
+
         }
 
         btnEspecialidad.setOnClickListener {

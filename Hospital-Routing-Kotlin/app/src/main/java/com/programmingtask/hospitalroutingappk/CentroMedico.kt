@@ -4,9 +4,9 @@ data class CentroMedico(
     var id: String = "",
     var nombre: String = "",
     var especialidades: ArrayList<String> = ArrayList<String>(), // Lista de nombres de especialidades
-    var horarioAtencion: ArrayList<String> = ArrayList<String>(), // Ej: "Lun-Vie: 8:00-20:00"
-    var latitud: String = "",
-    var longitud: String = "",
+    var horarioAtencion: ArrayList<HorarioAtencion> = ArrayList(), // Ej: "Lun-Vie: 8:00-20:00"
+    var latitud: Double = 0.0,
+    var longitud: Double = 0.0,
     var imagenUrl: String = "",
     var activo: Boolean = true
 ) {
@@ -20,14 +20,14 @@ data class CentroMedico(
     }
 
     fun getHorarioDeAtencionTexto(): String{
+        var horarioLunesViernes = horarioAtencion[0].horaInicio.toString() + " a " + horarioAtencion[0].horaFin.toString()
+        var horarioSabado = horarioAtencion[5].horaInicio.toString()+ " a " + horarioAtencion[5].horaFin.toString()
+        var horarioDomingo = horarioAtencion[6].horaInicio.toString()+ " a " + horarioAtencion[6].horaFin.toString()
+
         return if(horarioAtencion.isNotEmpty()){
-            "L"+horarioAtencion[0]+"\n"+
-            "M"+horarioAtencion[1]+"\n"+
-            "Mi"+horarioAtencion[2]+"\n"+
-            "J"+horarioAtencion[3]+"\n"+
-            "V"+horarioAtencion[4]+"\n"+
-            "S"+horarioAtencion[5]+"\n"+
-            "D"+horarioAtencion[6]+"\n"
+            "L-V: "+horarioLunesViernes+" "+ "\n"+
+            "S"+horarioSabado+"\n"+
+            "D"+horarioDomingo+"\n"
         } else {
             "Sin horario de atencion"
         }

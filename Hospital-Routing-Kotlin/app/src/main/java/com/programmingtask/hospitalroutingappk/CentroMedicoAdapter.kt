@@ -43,23 +43,24 @@ class CentroMedicoAdapter (
         val tvEspecialidades = view.findViewById<TextView>(R.id.lblespecialidades)
         val tvHorarioAtencion = view.findViewById<TextView>(R.id.lblhorarioatencion)
 
-        val btnModificarHospital = view.findViewById<Button>(R.id.btnmodificarhospital)
         val btnEliminarHospital = view.findViewById<Button>(R.id.btnEliminarHospital)
 
-
+        var id = centroMedico.id
         tvNombreHospital.text = centroMedico.nombre
         tvEspecialidades.text = centroMedico.getEspecialidadesTexto()
         tvHorarioAtencion.text = centroMedico.getHorarioDeAtencionTexto()
 
         btnEliminarHospital.setOnClickListener {
             // Tu código aquí
-            Toast.makeText(view.context,"Boton Eliminar presionado", Toast.LENGTH_SHORT).show()
+
+            val hospitalReferencia = OnDatabase.tablaBaseDeDatos("CentrosMedicos")
+
+            var controller = CentroMedicoController()
+            controller.removeCentroMedico(hospitalReferencia,centroMedico,id)
 
         }
 
-        btnModificarHospital.setOnClickListener {
-            Toast.makeText(view.context,"Boton Modificar presionado", Toast.LENGTH_SHORT).show()
-        }
+
 
 
         return view
