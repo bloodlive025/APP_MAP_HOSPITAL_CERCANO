@@ -31,6 +31,7 @@ class AddHospitalActivity: AppCompatActivity() {
     private lateinit var horarioAtencion: ArrayList<HorarioAtencion>
     var latitudDouble = 0.0
     var longitudDouble = 0.0
+        private lateinit var especialidadController: EspecialidadController
     // Claves para guardar el estado
     companion object {
         private const val KEY_LATITUD = "latitud"
@@ -43,6 +44,9 @@ class AddHospitalActivity: AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.add_hospital)
         val hospitalReferencia = OnDatabase.tablaBaseDeDatos("CentrosMedicos")
+        val especialidadReferencia = OnDatabase.tablaBaseDeDatos("Especialidades")
+
+        especialidadController = EspecialidadController()
 
         var nombreHospital = findViewById<EditText>(R.id.etNombre)
         btnGuardar = findViewById<Button>(R.id.btnGuargarAddHospital)
@@ -84,52 +88,50 @@ class AddHospitalActivity: AppCompatActivity() {
 
 
 
+        especialidadController.listarEspecialidades(especialidadReferencia,this){lista ->
+            val especialidades = mutableListOf("Seleccionar Especialidad:")
+            especialidades.addAll(lista.map{it.nombre})
 
+            val adapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_item,
+                especialidades
+            )
 
-        val especialidades = arrayOf(
-            "Seleccionar item: ",
-            "Cardiología",
-            "Dermatología",
-            "Pediatría",
-            "Neurología",
-            "Traumatología"
-        )
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_item,
-            especialidades
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        opcionEspecialidad.adapter = adapter
-        opcionEspecialidad.setOnItemSelectedListener(object: android.widget.AdapterView.OnItemSelectedListener{
-            override fun onItemSelected(parent: android.widget.AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
-                val especialidadSeleccionada = parent.getItemAtPosition(position).toString()
-                val yaExiste = (0 until chipEspecialidades.childCount).any { index ->
-                    val chip = chipEspecialidades.getChildAt(index) as com.google.android.material.chip.Chip
-                    chip.text == especialidadSeleccionada
-                }
+            opcionEspecialidad.adapter = adapter
+            opcionEspecialidad.setOnItemSelectedListener(object: android.widget.AdapterView.OnItemSelectedListener{
+                override fun onItemSelected(parent: android.widget.AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
+                    val especialidadSeleccionada = parent.getItemAtPosition(position).toString()
+                    val yaExiste = (0 until chipEspecialidades.childCount).any { index ->
+                        val chip = chipEspecialidades.getChildAt(index) as com.google.android.material.chip.Chip
+                        chip.text == especialidadSeleccionada
+                    }
 
-                if (!yaExiste && position != 0) {
-                    // Crear chip dinámico
-                    val chip =
-                        com.google.android.material.chip.Chip(this@AddHospitalActivity).apply {
-                            text = especialidadSeleccionada
-                            isCloseIconVisible = true   // X para borrar
-                            setOnCloseIconClickListener {
-                                chipEspecialidades.removeView(this)
+                    if (!yaExiste && position != 0) {
+                        // Crear chip dinámico
+                        val chip =
+                            com.google.android.material.chip.Chip(this@AddHospitalActivity).apply {
+                                text = especialidadSeleccionada
+                                isCloseIconVisible = true   // X para borrar
+                                setOnCloseIconClickListener {
+                                    chipEspecialidades.removeView(this)
+                                }
+                                setTextAppearance(R.style.CustomChipStyle)
                             }
-                            setTextAppearance(R.style.CustomChipStyle)
-                        }
-                    chipEspecialidades.addView(chip)
-                }
+                        chipEspecialidades.addView(chip)
+                    }
 
-            }
+                }
                 override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {
                     // No hacer nada
                 }
 
             })
+
+        }
+
 
         btnUbicacion.setOnClickListener {
             val intentUbicacion= Intent(this, SeleccionarUbicacionActivity::class.java)

@@ -12,6 +12,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnbuscar : Button
     private lateinit var btnHospital : Button
     private lateinit var btnEspecialidad: Button
+    private lateinit var especialidadController: EspecialidadController
 
     private lateinit var opcionEspecialidad: Spinner
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,22 +26,26 @@ class MainActivity : AppCompatActivity() {
 
         opcionEspecialidad = findViewById(R.id.spinner)
 
+        var referencia = OnDatabase.tablaBaseDeDatos("Especialidades")
         //Cambiar para poder obtener las especcialidades de la base de datos
-        val especialidades = arrayOf(
-            "Cardiología",
-            "Dermatología",
-            "Pediatría",
-            "Neurología",
-            "Traumatología"
-        )
 
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_item,
-            especialidades
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        opcionEspecialidad.adapter = adapter
+        especialidadController = EspecialidadController()
+
+        especialidadController.listarEspecialidades(referencia,this){ lista ->
+
+            val nombres = lista.map { it.nombre }
+
+            val adapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_item,
+                nombres
+            )
+
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            opcionEspecialidad.adapter = adapter
+        }
+
+
 
 
 

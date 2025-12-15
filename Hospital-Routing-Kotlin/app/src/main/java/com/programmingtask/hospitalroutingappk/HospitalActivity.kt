@@ -8,7 +8,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.programmingtask.hospitalroutingappk.HospitalesRepository.listaCentros
 
 //import com.google.firebase.storage.storage
 
@@ -18,13 +20,15 @@ class HospitalActivity: AppCompatActivity() {
 
     private lateinit var adapter: CentroMedicoAdapter
 
-    private val listaCentros = mutableListOf<CentroMedico>()
+    private lateinit var centroMedicoController : CentroMedicoController
+    private lateinit var referencia: DatabaseReference
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.main_menu_hospital)
-        val hospitalReferencia = OnDatabase.tablaBaseDeDatos("CentrosMedicos")
+        referencia = OnDatabase.tablaBaseDeDatos("CentrosMedicos")
         //var storageRef =Firebase.storage
         //val hospitalImagen = storageRef.getReference("CentrosMedicos")
 
@@ -41,31 +45,18 @@ class HospitalActivity: AppCompatActivity() {
         adapter = CentroMedicoAdapter(this, listaCentros)
         listViewHospital.adapter = adapter
 
-        cargarHospitales(hospitalReferencia)
+        centroMedicoController = CentroMedicoController()
 
-
+        centroMedicoController.cargarHospitales(referencia,adapter,this)
 
     }
 
-    private fun cargarHospitales(ref: com.google.firebase.database.DatabaseReference) {
-        ref.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                Toast.makeText(this@HospitalActivity, "GG", Toast.LENGTH_SHORT).show()
 
-                listaCentros.clear()
-                for (hospitalSnapshot in snapshot.children) {
-                    val hospital = hospitalSnapshot.getValue(CentroMedico::class.java)
-                    hospital?.let {
-                        listaCentros.add(it)
-                    }
-                }
-                adapter.notifyDataSetChanged()
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@HospitalActivity, "Error al cargar CentrosMedicos: ${error.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+    override fun onDestroy() {
+        super.onDestroy()
+        centroMedicoController.removerListener(referencia)
     }
+
+
 
 }

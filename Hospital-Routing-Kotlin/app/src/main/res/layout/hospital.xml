@@ -1,64 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
 
-    <LinearLayout
-        android:layout_width="399dp"
-        android:layout_height="186dp"
-        android:orientation="horizontal"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="3dp">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
-        <ImageView
+        <!-- Imagen del hospital -->
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imageView2"
-            android:layout_width="161dp"
-            android:layout_height="143dp"
-            android:layout_weight="1"
-            tools:srcCompat="@tools:sample/avatars" />
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars" />
 
+        <!-- Nombre del hospital -->
+        <TextView
+            android:id="@+id/lblnombreHospital"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imageView2"
+            app:layout_constraintTop_toTopOf="@id/imageView2"
+            tools:text="Hospital Central" />
+
+        <!-- Especialidades -->
+        <TextView
+            android:id="@+id/lblespecialidades"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintEnd_toEndOf="@id/lblnombreHospital"
+            app:layout_constraintStart_toStartOf="@id/lblnombreHospital"
+            app:layout_constraintTop_toBottomOf="@id/lblnombreHospital"
+            tools:text="Cardiología, Pediatría, Neurología" />
+
+        <!-- Horario de atención -->
+        <TextView
+            android:id="@+id/lblhorarioatencion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"
+            android:textColor="@android:color/darker_gray"
+            android:drawableStart="@android:drawable/ic_menu_recent_history"
+            android:drawablePadding="4dp"
+            app:layout_constraintEnd_toEndOf="@id/lblnombreHospital"
+            app:layout_constraintStart_toStartOf="@id/lblnombreHospital"
+            app:layout_constraintTop_toBottomOf="@id/lblespecialidades"
+            tools:text="Lun-Vie: 8:00 AM - 8:00 PM" />
+
+        <!-- Contenedor de botones -->
         <LinearLayout
-            android:layout_width="316dp"
-            android:layout_height="175dp"
-            android:orientation="vertical">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageView2">
 
-            <TextView
-                android:id="@+id/lblnombreHospital"
-                android:layout_width="match_parent"
-                android:layout_height="31dp" />
-
-            <TextView
-                android:id="@+id/lblespecialidades"
-                android:layout_width="match_parent"
-                android:layout_height="31dp"
-                android:text="especialidades" />
-
-            <TextView
-                android:id="@+id/lblhorarioatencion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="atencion" />
-
-            <Button
+            <!-- Botón Ubicación -->
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnubicacion"
-                android:layout_width="match_parent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:insetLeft="12dp"
-                android:insetRight="5dp"
-                android:insetBottom="6dp"
-                android:rotationX="6"
-                android:text="Ubicacion" />
-
-            <Button
-                android:id="@+id/btnEliminarHospital"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Ubicación"
                 android:textSize="14sp"
-                tools:text="Eliminar" />
+                app:icon="@android:drawable/ic_dialog_map"
+                app:iconGravity="textStart" />
+
+            <!-- Botón Eliminar -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEliminarHospital"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Eliminar"
+                android:textSize="14sp"
+                android:textColor="@android:color/holo_red_dark"
+                app:icon="@android:drawable/ic_menu_delete"
+                app:iconGravity="textStart"
+                app:iconTint="@android:color/holo_red_dark" />
+
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
