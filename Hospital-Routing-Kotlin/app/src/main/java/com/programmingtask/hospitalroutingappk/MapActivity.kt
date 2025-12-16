@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Calendar
+import android.util.Log
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -134,6 +135,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 hospitalMarkers.forEach { it.second.remove() }
                 hospitalMarkers.clear()
 
+                Log.d("MapActivity", "Cargando hospitales desde Firebase...")
+
                 for (child in snapshot.children) {
                     val id = child.child("id").getValue(String::class.java) ?: child.key ?: continue
                     val nombre = child.child("nombre").getValue(String::class.java) ?: "Hospital"
@@ -142,7 +145,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     val activo = child.child("activo").getValue(Boolean::class.java) ?: true
 
                     // Validar coordenadas
-                    if (latitud == 0.0 || longitud == 0.0) continue
+                    if (latitud == 0.0 || longitud == 0.0) {
+                        Log.d("MapActivity", "Hospital sin coordenadas válidas: $nombre")
+                        continue
+                    }
 
                     // Parsear especialidades
                     val especialidadesTexto = child.child("especialidadesTexto").getValue(String::class.java) ?: ""
@@ -152,6 +158,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     // Parsear horarios
                     val horarios = parseHorarios(child)
+
+                    Log.d("MapActivity", "Hospital: $nombre, Especialidades: $especialidades, Horarios: ${horarios.size}")
 
                     // Crear objeto CentroMedico
                     val centro = CentroMedico(id, nombre, especialidades, horarios, latitud, longitud)
@@ -169,9 +177,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         hospitalMarkers.add(centro to marker)
                     }
                 }
+
+                Log.d("MapActivity", "Total hospitales cargados: ${hospitalMarkers.size}")
             }
 
             override fun onCancelled(error: DatabaseError) {
+                Log.e("MapActivity", "Error al cargar hospitales: ${error.message}")
                 Toast.makeText(
                     this@MapActivity,
                     "Error al cargar hospitales: ${error.message}",
@@ -212,39 +223,65 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // S: Sábado (dia 5)
         // D: Domingo (dia 6)
 
-        val lvMatch = Regex("""L-?V:?\s*(\d{1,2})\s*a\s*(\d{1,2})""", RegexOption.IGNORE_CASE).find(texto)
+        Log.d("MapActivity", "Parseando horarios: $texto")
+        
+        // Parsear L-V (Lunes a Viernes)
+        val lvRegex = Regex("""[Ll]-?[Vv]:?\s*(\d{1,2})\s*a\s*(\d{1,2})""")
+        val lvMatch = lvRegex.find(texto)
         if (lvMatch != null) {
-            val inicio = lvMatch.groupValues[1].toIntOrNull() ?: return horarios
-            val fin = lvMatch.groupValues[2].toIntOrNull() ?: return horarios
-            for (dia in 0..4) {
-                horarios.add(HorarioAtencion(dia, inicio, fin))
+            val inicio = lvMatch.groupValues[1].toIntOrNull()
+            val fin = lvMatch.groupValues[2].toIntOrNull()
+            Log.d("MapActivity", "L-V encontrado: $inicio - $fin")
+            if (inicio != null && fin != null) {
+                for (dia in 0..4) {
+                    horarios.add(HorarioAtencion(dia, inicio, fin))
+                }
             }
         }
 
-        val sMatch = Regex("""S:?\s*(\d{1,2})\s*a\s*(\d{1,2})""", RegexOption.IGNORE_CASE).find(texto)
+        // Parsear S (Sábado) - evitar confusión con "domingo"
+        val sRegex = Regex("""[Ss]\s*(\d{1,2})\s*a\s*(\d{1,2})""")
+        val sMatch = sRegex.find(texto)
         if (sMatch != null) {
-            val inicio = sMatch.groupValues[1].toIntOrNull() ?: return horarios
-            val fin = sMatch.groupValues[2].toIntOrNull() ?: return horarios
-            horarios.add(HorarioAtencion(5, inicio, fin))
+            val inicio = sMatch.groupValues[1].toIntOrNull()
+            val fin = sMatch.groupValues[2].toIntOrNull()
+            Log.d("MapActivity", "S encontrado: $inicio - $fin")
+            if (inicio != null && fin != null) {
+                horarios.add(HorarioAtencion(5, inicio, fin))
+            }
         }
 
-        val dMatch = Regex("""D:?\s*(\d{1,2})\s*a\s*(\d{1,2})""", RegexOption.IGNORE_CASE).find(texto)
+        // Parsear D (Domingo)
+        val dRegex = Regex("""[Dd]\s*(\d{1,2})\s*a\s*(\d{1,2})""")
+        val dMatch = dRegex.find(texto)
         if (dMatch != null) {
-            val inicio = dMatch.groupValues[1].toIntOrNull() ?: return horarios
-            val fin = dMatch.groupValues[2].toIntOrNull() ?: return horarios
-            horarios.add(HorarioAtencion(6, inicio, fin))
+            val inicio = dMatch.groupValues[1].toIntOrNull()
+            val fin = dMatch.groupValues[2].toIntOrNull()
+            Log.d("MapActivity", "D encontrado: $inicio - $fin")
+            if (inicio != null && fin != null) {
+                horarios.add(HorarioAtencion(6, inicio, fin))
+            }
         }
 
+        Log.d("MapActivity", "Horarios parseados: ${horarios.size}")
         return horarios
     }
 
     private fun tryRouteToNearestOpenHospital(userLatLng: LatLng) {
         val especialidad = intent.getStringExtra("Especialidad")?.trim()
-        if (especialidad.isNullOrEmpty()) return
+        if (especialidad.isNullOrEmpty()) {
+            Log.d("MapActivity", "No especialidad en Intent")
+            return
+        }
+
+        Log.d("MapActivity", "Buscando especialidad: $especialidad")
+        Log.d("MapActivity", "Hospitales cargados: ${hospitalMarkers.size}")
 
         val now = Calendar.getInstance()
-        val dayOfWeek = now.get(Calendar.DAY_OF_WEEK) // 1=Domingo, 2=Lunes, ..., 7=Sábado
+        val dayOfWeek = now.get(Calendar.DAY_OF_WEEK)
         val hour24 = now.get(Calendar.HOUR_OF_DAY)
+
+        Log.d("MapActivity", "Día: $dayOfWeek, Hora: $hour24")
 
         // Mapear Calendar.DAY_OF_WEEK a índice 0..6 (0=Lunes, 6=Domingo)
         val diaIndex = when (dayOfWeek) {
@@ -260,12 +297,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Filtrar hospitales que contengan la especialidad y estén abiertos
         val candidatosAbiertos = hospitalMarkers.map { it.first }.filter { centro ->
-            centro.especialidades.any { it.equals(especialidad, ignoreCase = true) } &&
-            estaAbierto(centro.horarioAtencion, diaIndex, hour24)
+            val tieneEspecialidad = centro.especialidades.any { it.equals(especialidad, ignoreCase = true) }
+            val estaAbiertoAhora = estaAbierto(centro.horarioAtencion, diaIndex, hour24)
+            Log.d("MapActivity", "Hospital: ${centro.nombre}, Especialidad: $tieneEspecialidad, Abierto: $estaAbiertoAhora")
+            tieneEspecialidad && estaAbiertoAhora
         }
 
+        Log.d("MapActivity", "Candidatos abiertos: ${candidatosAbiertos.size}")
+
         if (candidatosAbiertos.isEmpty()) {
-            Toast.makeText(this, "No hay centros abiertos para: $especialidad", Toast.LENGTH_SHORT).show()
+            runOnUiThread {
+                Toast.makeText(this, "❌ No hay centros abiertos para: $especialidad", Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
@@ -276,49 +319,151 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             dLat * dLat + dLng * dLng
         } ?: return
 
+        Log.d("MapActivity", "Hospital más cercano: ${nearest.nombre}")
+        Log.d("MapActivity", "Ubicación usuario: ${userLatLng.latitude}, ${userLatLng.longitude}")
+        Log.d("MapActivity", "Ubicación hospital: ${nearest.latitud}, ${nearest.longitud}")
+
         // Trazar ruta al hospital más cercano
         drawRouteToHospital(userLatLng, LatLng(nearest.latitud, nearest.longitud), nearest.nombre)
     }
 
     private fun estaAbierto(horarios: ArrayList<HorarioAtencion>?, diaIndex: Int, horaActual24: Int): Boolean {
-        if (horarios == null || horarios.isEmpty()) return false
-        val hDia = horarios.firstOrNull { it.dia == diaIndex } ?: return false
-        return horaActual24 in hDia.horaInicio..hDia.horaFin
+        if (horarios == null || horarios.isEmpty()) {
+            Log.d("MapActivity", "No hay horarios para el día $diaIndex")
+            return false
+        }
+        val hDia = horarios.firstOrNull { it.dia == diaIndex }
+        if (hDia == null) {
+            Log.d("MapActivity", "No hay horario para el día $diaIndex")
+            return false
+        }
+        val estaAbierto = horaActual24 in hDia.horaInicio..hDia.horaFin
+        Log.d("MapActivity", "Día $diaIndex: Abierto $hDia.horaInicio-${hDia.horaFin}, Hora actual: $horaActual24, Abierto: $estaAbierto")
+        return estaAbierto
     }
 
     private fun drawRouteToHospital(start: LatLng, end: LatLng, hospitalName: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val retrofit = Retrofit.Builder()
-                .baseUrl("https://maps.googleapis.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+            try {
+                val retrofit = Retrofit.Builder()
+                    .baseUrl("https://maps.googleapis.com/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
 
-            val service = retrofit.create(ApiService::class.java)
-            val call = service.getRoute(
-                "${start.latitude},${start.longitude}",
-                "${end.latitude},${end.longitude}",
-                getString(R.string.google_maps_key)
-            )
+                val service = retrofit.create(ApiService::class.java)
+                val apiKey = getString(R.string.google_maps_key)
+                
+                val startStr = "${start.latitude},${start.longitude}"
+                val endStr = "${end.latitude},${end.longitude}"
+                Log.d("MapActivity", "Origen: $startStr, Destino: $endStr")
+                Log.d("MapActivity", "API Key (primeros 20 chars): ${apiKey.take(20)}...")
+                
+                val call = service.getRoute(startStr, endStr, apiKey)
 
-            if (call.isSuccessful) {
-                val points = call.body()?.routes?.firstOrNull()
-                    ?.overviewPolyline?.points ?: return@launch
+                Log.d("MapActivity", "Respuesta: ${call.isSuccessful}, Código: ${call.code()}")
 
-                val decoded = PolyUtil.decode(points)
+                if (call.isSuccessful) {
+                    val response = call.body()
+                    Log.d("MapActivity", "Response status: ${response?.status}")
+                    Log.d("MapActivity", "Response completa: $response")
+                    
+                    if (response == null) {
+                        Log.e("MapActivity", "Respuesta nula")
+                        runOnUiThread {
+                            Toast.makeText(this@MapActivity, "❌ Respuesta nula de API", Toast.LENGTH_LONG).show()
+                        }
+                        return@launch
+                    }
+                    
+                    // Verificar el status de Google
+                    if (response.status != "OK") {
+                        Log.e("MapActivity", "Google status no es OK: ${response.status}")
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@MapActivity, 
+                                "❌ Google API status: ${response.status}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        return@launch
+                    }
+                    
+                    Log.d("MapActivity", "Routes size: ${response.routes?.size}")
+                    
+                    val routes = response.routes
+                    if (routes == null || routes.isEmpty()) {
+                        Log.e("MapActivity", "No hay rutas en la respuesta")
+                        runOnUiThread {
+                            Toast.makeText(this@MapActivity, "❌ API sin rutas disponibles", Toast.LENGTH_LONG).show()
+                        }
+                        return@launch
+                    }
 
+                    val firstRoute = routes.first()
+                    Log.d("MapActivity", "Primera ruta: $firstRoute")
+                    
+                    val polyline = firstRoute.overviewPolyline
+                    Log.d("MapActivity", "Polyline: $polyline")
+                    
+                    val points = polyline?.points
+                    Log.d("MapActivity", "Points string: $points")
+                    
+                    if (points.isNullOrEmpty()) {
+                        Log.e("MapActivity", "No hay puntos en la polyline")
+                        runOnUiThread {
+                            Toast.makeText(this@MapActivity, "❌ Sin puntos en polyline", Toast.LENGTH_LONG).show()
+                        }
+                        return@launch
+                    }
+
+                    Log.d("MapActivity", "Decodificando ${points.length} caracteres")
+                    val decoded = PolyUtil.decode(points)
+                    Log.d("MapActivity", "Puntos decodificados: ${decoded.size}")
+
+                    if (decoded.isEmpty()) {
+                        Log.e("MapActivity", "Decodificación resultó en lista vacía")
+                        runOnUiThread {
+                            Toast.makeText(this@MapActivity, "❌ Error al decodificar ruta", Toast.LENGTH_LONG).show()
+                        }
+                        return@launch
+                    }
+
+                    runOnUiThread {
+                        routeToHospital?.remove()
+                        routeToHospital = map.addPolyline(
+                            PolylineOptions().addAll(decoded).color(Color.GREEN).width(16f)
+                        )
+                        Log.d("MapActivity", "✓ Polyline añadido al mapa")
+
+                        val distance = response.routes.firstOrNull()?.legs?.firstOrNull()?.distance?.text
+                        val duration = response.routes.firstOrNull()?.legs?.firstOrNull()?.duration?.text
+
+                        tvLocation.text = "$hospitalName\n📍 $distance • ⏱️ $duration"
+
+                        Toast.makeText(
+                            this@MapActivity,
+                            "✅ $hospitalName → $distance • $duration",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } else {
+                    val errorBody = call.errorBody()?.string()
+                    Log.e("MapActivity", "Error en API: ${call.code()} - ${call.message()}\nBody: $errorBody")
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@MapActivity,
+                            "❌ Error API: ${call.code()}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("MapActivity", "Excepción en drawRouteToHospital: ${e.message}", e)
                 runOnUiThread {
-                    routeToHospital?.remove()
-                    routeToHospital = map.addPolyline(
-                        PolylineOptions().addAll(decoded).color(Color.GREEN).width(16f)
-                    )
-
-                    val distance = call.body()?.routes?.firstOrNull()?.legs?.firstOrNull()?.distance?.text
-                    val duration = call.body()?.routes?.firstOrNull()?.legs?.firstOrNull()?.duration?.text
-
                     Toast.makeText(
                         this@MapActivity,
-                        "$hospitalName → $distance • $duration",
-                        Toast.LENGTH_SHORT
+                        "❌ Excepción: ${e.message}",
+                        Toast.LENGTH_LONG
                     ).show()
                 }
             }

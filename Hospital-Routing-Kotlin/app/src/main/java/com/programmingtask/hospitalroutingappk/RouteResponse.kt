@@ -3,7 +3,8 @@ package com.programmingtask.hospitalroutingappk
 import com.google.gson.annotations.SerializedName
 
 data class RouteResponse(
-    @SerializedName("routes") val routes: List<Route>
+    @SerializedName("routes") val routes: List<Route>?,
+    @SerializedName("status") val status: String = ""
 )
 
 data class Route(
