@@ -6,10 +6,12 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.storage.storage
 import com.programmingtask.hospitalroutingappk.HospitalesRepository.listaCentros
 
 //import com.google.firebase.storage.storage
@@ -29,6 +31,8 @@ class HospitalActivity: AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.main_menu_hospital)
         referencia = OnDatabase.tablaBaseDeDatos("CentrosMedicos")
+        var storageRef = Firebase.storage
+        val centroMedicoImagen=storageRef.getReference("CentroMedico")
         //var storageRef =Firebase.storage
         //val hospitalImagen = storageRef.getReference("CentrosMedicos")
 

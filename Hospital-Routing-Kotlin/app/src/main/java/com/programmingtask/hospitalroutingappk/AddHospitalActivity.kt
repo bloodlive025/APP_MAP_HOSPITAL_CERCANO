@@ -2,12 +2,16 @@ package com.programmingtask.hospitalroutingappk
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -17,21 +21,35 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isEmpty
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.firebase.Firebase
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.storage
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.ByteArrayOutputStream
 import java.util.UUID
 
 class AddHospitalActivity: AppCompatActivity() {
 
     private lateinit var opcionEspecialidad: Spinner
+    var mBitmap = Bitmap.createBitmap(512,512, Bitmap.Config.ARGB_8888)
     private lateinit var btnGuardar: Button
+    private lateinit var btnSeleccionarImagen: Button
     private lateinit var btnUbicacion: Button
     private lateinit var btnHorario: Button
     private lateinit var longitud: TextView
     private lateinit var latitud: TextView
+    lateinit var imagenHospital: ImageView
     private lateinit var horarioAtencion: ArrayList<HorarioAtencion>
     var latitudDouble = 0.0
     var longitudDouble = 0.0
-        private lateinit var especialidadController: EspecialidadController
+    private lateinit var especialidadController: EspecialidadController
+    lateinit var centroMedicoImagen : StorageReference
     // Claves para guardar el estado
     companion object {
         private const val KEY_LATITUD = "latitud"
@@ -46,18 +64,24 @@ class AddHospitalActivity: AppCompatActivity() {
         val hospitalReferencia = OnDatabase.tablaBaseDeDatos("CentrosMedicos")
         val especialidadReferencia = OnDatabase.tablaBaseDeDatos("Especialidades")
 
+        var storageRef = Firebase.storage
+        centroMedicoImagen=storageRef.getReference("CentroMedico")
+
+
         especialidadController = EspecialidadController()
 
         var nombreHospital = findViewById<EditText>(R.id.etNombre)
         btnGuardar = findViewById<Button>(R.id.btnGuargarAddHospital)
         btnUbicacion = findViewById<Button>(R.id.btnUbicacionAddHospital)
         btnHorario = findViewById<Button>(R.id.btnHorarioDeAtencion)
+        btnSeleccionarImagen = findViewById<Button>(R.id.btnSeleccionarImagen)
         horarioAtencion = ArrayList()
         opcionEspecialidad = findViewById<Spinner>(R.id.spEspecialidad)
 
         var chipEspecialidades = findViewById<ChipGroup>(R.id.cgespecialidades)
         longitud = findViewById<TextView>(R.id.tvlongitudHospital)
         latitud = findViewById<TextView>(R.id.tvLatitudHospital)
+        imagenHospital = findViewById<ImageView>(R.id.ivCentroMedicoAniadirImagen)
 
 
 
@@ -132,6 +156,20 @@ class AddHospitalActivity: AppCompatActivity() {
 
         }
 
+        val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val selectedImage: Uri? = result.data?.data
+                selectedImage?.let {
+                    val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, it)
+                    mBitmap = bitmap
+                    imagenHospital.setImageBitmap(bitmap)
+                }
+            }
+        }
+        btnSeleccionarImagen.setOnClickListener {
+            val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            galleryLauncher.launch(galleryIntent)
+        }
 
         btnUbicacion.setOnClickListener {
             val intentUbicacion= Intent(this, SeleccionarUbicacionActivity::class.java)
@@ -223,14 +261,47 @@ class AddHospitalActivity: AppCompatActivity() {
         }
 
         var hospital = CentroMedico(id.toString(),nombreHospital,listaEspecialidades,horarioAtencion,latitud,longitud)
+        uploadImage(mBitmap,hospital){ success, url ->
+            if (success && url != null) {
+                hospital.imagenUrl = url
 
-        var controller = CentroMedicoController()
-
-        controller.AddCentroMedico(referencia, hospital) { success ->
-            if (success) Toast.makeText(this, "Guardado", Toast.LENGTH_SHORT).show()
-            else Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show()
+                // Ahora sí, guarda el hospital CON la URL
+                val controller = CentroMedicoController()
+                controller.AddCentroMedico(referencia, hospital) { successDb ->
+                    if (successDb) {
+                        Toast.makeText(this, "Guardado correctamente", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Error al subir imagen", Toast.LENGTH_SHORT).show()
+            }
         }
 
+
+
+    }
+
+    fun uploadImage(bitmap: Bitmap, centroMedicoActual: CentroMedico,
+                    callback: (Boolean, String?) -> Unit) {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+
+        val referenciaContactoFirebase = centroMedicoImagen.child("imagenes/${centroMedicoActual.id}.jpg")
+
+        referenciaContactoFirebase.putBytes(byteArray)
+            .addOnSuccessListener { taskSnapshot ->
+                taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener { uri ->
+                    callback(true, uri.toString())
+                }?.addOnFailureListener {
+                    callback(false, null)
+                }
+            }
+            .addOnFailureListener {
+                callback(false, null)
+            }
     }
 
 

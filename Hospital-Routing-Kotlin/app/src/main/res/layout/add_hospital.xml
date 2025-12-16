@@ -47,25 +47,31 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
                     android:text="Información Básica"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:layout_marginBottom="16dp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <!-- Nombre del Hospital -->
+                <ImageView
+                    android:id="@+id/ivCentroMedicoAniadirImagen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:srcCompat="@tools:sample/avatars" />
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilNombre"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
                     android:hint="Nombre del Centro Médico"
-                    app:startIconDrawable="@android:drawable/ic_menu_mylocation"
                     app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusTopStart="8dp"
-                    app:boxCornerRadiusTopEnd="8dp"
-                    app:boxCornerRadiusBottomStart="8dp"
                     app:boxCornerRadiusBottomEnd="8dp"
-                    android:layout_marginBottom="16dp">
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:startIconDrawable="@android:drawable/ic_menu_mylocation">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etNombre"
@@ -73,7 +79,14 @@
                         android:layout_height="wrap_content"
                         android:inputType="textCapWords"
                         android:maxLines="1" />
+
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <Button
+                    android:id="@+id/btnSeleccionarImagen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Añadir Imagen" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
