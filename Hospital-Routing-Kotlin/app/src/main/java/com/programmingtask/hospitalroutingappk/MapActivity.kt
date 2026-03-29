@@ -307,7 +307,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (candidatosAbiertos.isEmpty()) {
             runOnUiThread {
-                Toast.makeText(this, "❌ No hay centros abiertos para: $especialidad", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "No hay centros abiertos para: $especialidad", Toast.LENGTH_SHORT).show()
             }
             return
         }
@@ -370,7 +370,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (response == null) {
                         Log.e("MapActivity", "Respuesta nula")
                         runOnUiThread {
-                            Toast.makeText(this@MapActivity, "❌ Respuesta nula de API", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@MapActivity, "Respuesta nula de API", Toast.LENGTH_LONG).show()
                         }
                         return@launch
                     }
@@ -381,7 +381,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         runOnUiThread {
                             Toast.makeText(
                                 this@MapActivity, 
-                                "❌ Google API status: ${response.status}",
+                                "Google API status: ${response.status}",
                                 Toast.LENGTH_LONG
                             ).show()
                         }
@@ -394,7 +394,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (routes == null || routes.isEmpty()) {
                         Log.e("MapActivity", "No hay rutas en la respuesta")
                         runOnUiThread {
-                            Toast.makeText(this@MapActivity, "❌ API sin rutas disponibles", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@MapActivity, "API sin rutas disponibles", Toast.LENGTH_LONG).show()
                         }
                         return@launch
                     }
@@ -411,7 +411,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (points.isNullOrEmpty()) {
                         Log.e("MapActivity", "No hay puntos en la polyline")
                         runOnUiThread {
-                            Toast.makeText(this@MapActivity, "❌ Sin puntos en polyline", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@MapActivity, "Sin puntos en polyline", Toast.LENGTH_LONG).show()
                         }
                         return@launch
                     }
@@ -423,7 +423,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (decoded.isEmpty()) {
                         Log.e("MapActivity", "Decodificación resultó en lista vacía")
                         runOnUiThread {
-                            Toast.makeText(this@MapActivity, "❌ Error al decodificar ruta", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@MapActivity, "Error al decodificar ruta", Toast.LENGTH_LONG).show()
                         }
                         return@launch
                     }
@@ -438,11 +438,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         val distance = response.routes.firstOrNull()?.legs?.firstOrNull()?.distance?.text
                         val duration = response.routes.firstOrNull()?.legs?.firstOrNull()?.duration?.text
 
-                        tvLocation.text = "$hospitalName\n📍 $distance • ⏱️ $duration"
+                        tvLocation.text = "$hospitalName\n $distance  $duration"
 
                         Toast.makeText(
                             this@MapActivity,
-                            "✅ $hospitalName → $distance • $duration",
+                            " $hospitalName → $distance • $duration",
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -452,7 +452,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     runOnUiThread {
                         Toast.makeText(
                             this@MapActivity,
-                            "❌ Error API: ${call.code()}",
+                            " Error API: ${call.code()}",
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -462,7 +462,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 runOnUiThread {
                     Toast.makeText(
                         this@MapActivity,
-                        "❌ Excepción: ${e.message}",
+                        "Excepción: ${e.message}",
                         Toast.LENGTH_LONG
                     ).show()
                 }

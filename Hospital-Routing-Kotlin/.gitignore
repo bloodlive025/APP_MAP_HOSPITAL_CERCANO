@@ -1,15 +1,71 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# =========================
+# Gradle
+# =========================
+.gradle/
+build/
+
+# Mantener wrapper (IMPORTANTE)
+!gradle/wrapper/gradle-wrapper.jar
+
+# =========================
+# Local configuration
+# =========================
 local.properties
+
+# =========================
+# Android Studio / IntelliJ
+# =========================
+.idea/
+*.iml
+
+# Archivos específicos que a veces quedan
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# =========================
+# Build outputs
+# =========================
+/app/build/
+/captures/
+
+# APK / AAB
+*.apk
+*.aab
+
+# =========================
+# Native build
+# =========================
+.externalNativeBuild/
+.cxx/
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Compiled files
+# =========================
+*.class
+
+# =========================
+# Keystore (CRÍTICO)
+# =========================
+*.jks
+*.keystore
+
+# =========================
+# Temp files
+# =========================
+*.tmp
+*.temp
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
